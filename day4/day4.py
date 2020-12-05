@@ -1,4 +1,32 @@
-with open("passtest_valid.txt", 'r') as input:
+def validateInteger(integer, minValue, maxValue):
+    if minValue <= integer <= maxValue:
+        return True
+
+def validateHexadecimal(hexString):
+    if "#" not in hexString:
+        return False
+    if len(hexString.replace("#", "")) != 6:
+        return False
+    for char in hexString.replace("#", ""):
+        if not (char.isdigit() or char in "abcdef"):
+            return False
+    return True
+
+def validateEyeColor(colorCode):
+    allowed_eye_colors = {"amb", "blu", "brn", "gry", "grn", "hzl", "oth"}
+    if colorCode in allowed_eye_colors:
+        return True
+
+def validateNumberLen(numberString, allowedLen):
+    if len(numberString) != allowedLen:
+        return False
+    for char in numberString:
+        if not char.isdigit():
+            return False
+    return True
+
+
+with open("data.txt", 'r') as input:
 
     lines = input.readlines()
 
@@ -32,8 +60,6 @@ with open("passtest_valid.txt", 'r') as input:
     #PART TWO
     valid_data_passports = 0
 
-    allowed_eye_colors = {"amb", "blu", "brn", "gry", "grn", "hzl", "oth"}
-
     for ps in passport_data:
         #split into fields
         fields = ps.split()
@@ -42,68 +68,45 @@ with open("passtest_valid.txt", 'r') as input:
             valid = True
             for field in fields:
                 if "byr" in field:
-                    field = field.replace("byr:", "")
-                    if not 1920 <= int(field) <= 2002:
-                        print("bid invalid")
+                    if not validateInteger(int(field.replace("byr:", "")), 1920, 2002):
                         valid = False
 
                 elif "iyr" in field:
-                    field = field.replace("iyr:", "")
-                    if not 2010 <= int(field) <= 2020:
-                        print("iyr invalid")
+                    if not validateInteger(int(field.replace("iyr:", "")), 2010, 2020):
                         valid = False
 
                 elif "eyr" in field:
-                    field = field.replace("eyr:", "")
-                    if not 2020 <= int(field) <= 2030:
-                        print("eyr invalid")
+                    if not validateInteger(int(field.replace("eyr:","")), 2020, 2030):
                         valid = False
 
                 elif "hgt" in field:
-                    field = field.replace("hgt:", "")
-                    if "cm" in field:
-                        field = field.replace("cm", "")
-                        if not 150 <= int(field) <= 193:
+                    if "cm" in field.replace("hgt:", ""):
+                        if not validateInteger(int (field.replace("hgt:", "").replace("cm", "")), 150, 193):
                             valid = False
-                    elif "in" in field:
-                        field = field.replace("in", "")
-                        if not 59 <= int(field) <= 76:
+                    elif "in" in field.replace("hgt:", ""):
+                        if not validateInteger(int(field.replace("hgt:", "").replace("in", "")), 59, 76):
                             valid = False
                     else:
                         valid = False
 
                 elif "hcl" in field:
-                    field = field.replace("hcl:", "")
-                    if not "#" in field:
+                    if not validateHexadecimal(field.replace("hcl:", "")):
                         valid = False
-                    else:
-                        for char in field.replace("#", ""):
-                            if not (char.isdigit() or char not in "abcdef"):
-                                valid = False
                 
                 elif "ecl" in field:
-                    field = field.replace("ecl:", "")
-                    if field not in allowed_eye_colors:
+                    if not validateEyeColor(field.replace("ecl:", "")):
                         valid = False
                     
                 elif "pid" in field:
-                    field = field.replace("pid:", "")
-                    if not len(field) == 9:
+                    if not validateNumberLen(field.replace("pid:", ""), 9):
                         valid = False
-                    else:
-                        for char in field:
-                            if not char.isdigit():
-                                valid = False
             if valid:
                 print("VALID")
             else:
                 print("INVALID")
-            valid_data_passports += valid
-                    
-                        
-
-
-
+            valid_data_passports += valid                  
+            
+    print("Here are the results!")
     print(valid_passports)
     print(valid_data_passports)
     input.close()
